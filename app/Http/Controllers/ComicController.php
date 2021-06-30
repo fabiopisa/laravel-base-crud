@@ -83,9 +83,12 @@ class ComicController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Comic $comic)
     {
-        //
+        if($comic){
+            return view('comics.edit', compact('comic'));
+        }
+        abort(404,'Prodotto non presente nel database');
     }
 
     /**
@@ -95,9 +98,12 @@ class ComicController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Comic $comic)
     {
-        //
+        $data =$request->all();
+        $data['slug'] =Str::slug($data['title'], '-');
+        $comic->update($data);
+        return redirect()->route('comics.show',$comic);
     }
 
     /**
@@ -106,8 +112,9 @@ class ComicController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Comic $comic)
     {
-        //
+        $comic->delete();
+        return redirect()->route('comics.index')->with('deleted', $comic->title);
     }
 }
